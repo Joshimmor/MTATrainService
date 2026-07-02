@@ -2,7 +2,7 @@
 import pandas as pd
 from google.transit import gtfs_realtime_pb2
 
-def find_closest_station(Long:float,Lat:float)-> str:
+def find_closest_station(Long:float,Lat:float,Line:str)-> str:
     """
     returns (string type)  ID of  the Subway station closest to the Longitude and Latitude that are passed as arguments. An pandas dataframe
     is iterated through, evaluating the absolute distance from the given point. 
@@ -12,12 +12,12 @@ def find_closest_station(Long:float,Lat:float)-> str:
     distance = 30
     stop_id = ''
     for index, row in df.iterrows():
-        if(abs(float(row['GTFS Longitude'])-Long)+abs(float(row['GTFS Latitude'])-Lat) < distance):
-            distance = abs(float(row['GTFS Longitude'])-Long)+abs(float(row['GTFS Latitude'])-Lat)
-            stop_id = row['GTFS Stop ID']
-            print(row['Stop Name'])
+        if(any(train_line in row['Daytime Routes'].split(' ') for train_line in Line.split(" "))):
+            if(abs(float(row['GTFS Longitude'])-Long)+abs(float(row['GTFS Latitude'])-Lat) < distance):
+                distance = abs(float(row['GTFS Longitude'])-Long)+abs(float(row['GTFS Latitude'])-Lat)
+                stop_id = row['GTFS Stop ID']
     return stop_id
-# print(find_closest_station(-73.8582322,40.6961786))
+
 #Filter GTFS Results
 def filter_results(feed,stop_id:str):
     from datetime import datetime
