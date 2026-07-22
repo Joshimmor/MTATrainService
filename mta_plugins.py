@@ -21,8 +21,10 @@ def find_closest_station(Long:float,Lat:float,Line:str)-> str:
 #Filter GTFS Results
 def filter_results(feed,stop_id:str):
     from datetime import datetime
+    now = datetime.now()
     ts = int(str(feed.header.timestamp))
-    print("Last update: " + datetime.fromtimestamp(ts).strftime('%d-%m-%Y %H:%M:%S'))
+    feed_age = int((now - datetime.fromtimestamp(ts)).total_seconds())
+    print("Last update: " + datetime.fromtimestamp(ts).strftime('%d-%m-%Y %H:%M:%S') + f" ({feed_age}s ago)")
     for entity in feed.entity:
         stops = []
         trains=[]
@@ -33,6 +35,8 @@ def filter_results(feed,stop_id:str):
                     stops.append(stop[0])
         for stop in stops:   
             time_til = datetime.fromtimestamp(stop.arrival.time)
+            if time_til < now:
+                continue
             direction = "Manhattan" if 'N' in stop.stop_id else "Jamaica"
             trains.append({'direction':direction,'time':time_til})
         results = []
